@@ -1,65 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:notes_app/blocs/auth/auth_bloc.dart';
-import 'package:notes_app/blocs/notes/notes_bloc.dart';
-import 'package:notes_app/repositories/auth_repository.dart';
-import 'package:notes_app/repositories/notes_repository.dart';
-import 'package:notes_app/screens/auth/auth_screen.dart';
-import 'package:notes_app/screens/notes/notes_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  // Ensure Flutter is initialized
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  try {
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('🔥 Firebase initialized successfully');
+  } catch (e) {
+    print('❌ Firebase initialization failed: $e');
+    // You might want to show an error screen here
+  }
+
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<AuthRepository>(
-          create: (context) => AuthRepository(),
-        ),
-        RepositoryProvider<NotesRepository>(
-          create: (context) => NotesRepository(),
-        ),
-      ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthBloc>(
-            create: (context) => AuthBloc(
-              authRepository: context.read<AuthRepository>(),
-            )..add(AuthCheckRequested()),
-          ),
-        ],
-        child: MaterialApp(
-          title: 'Notes App',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-          ),
-          home: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is AuthAuthenticated) {
-                return BlocProvider(
-                  create: (context) => NotesBloc(
-                    notesRepository: context.read<NotesRepository>(),
-                    userId: state.user.uid,
-                  )..add(NotesLoadRequested()),
-                  child: NotesScreen(),
-                );
-              } else {
-                return AuthScreen();
-              }
-            },
-          ),
+    return MaterialApp(
+      title: 'Notes App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: AuthWrapper(), // We'll create this to handle authentication
+    );
+  }
+}
+
+// This widget decides whether to show login or main app
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Notes App'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Welcome to Notes App!',
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // TODO: Navigate to login screen
+                print('Login button pressed');
+              },
+              child: Text('Login'),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                // TODO: Navigate to signup screen
+                print('Signup button pressed');
+              },
+              child: Text('Sign Up'),
+            ),
+          ],
         ),
       ),
     );
   }
-} 
+}
