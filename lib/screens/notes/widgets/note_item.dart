@@ -30,7 +30,7 @@ class NoteItem extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    note.text,
+                    note.content,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
