@@ -84,7 +84,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     final currentNotes = state.notes;
     emit(NotesOperationInProgress(notes: currentNotes));
     try {
-      await notesRepository.updateNote(event.id, event.text);
+      await notesRepository.updateNote(event.id, event.text, userId);
       final notes = await notesRepository.fetchNotes(userId);
       emit(NotesOperationSuccess(notes: notes, message: 'Note updated'));
     } catch (e) {
@@ -96,7 +96,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     final currentNotes = state.notes;
     emit(NotesOperationInProgress(notes: currentNotes));
     try {
-      await notesRepository.deleteNote(event.id);
+      await notesRepository.deleteNote(event.id, userId);
       final notes = await notesRepository.fetchNotes(userId);
       emit(NotesOperationSuccess(notes: notes, message: 'Note deleted'));
     } catch (e) {

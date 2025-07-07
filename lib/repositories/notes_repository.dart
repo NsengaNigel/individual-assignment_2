@@ -1,50 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:notes_app/models/note.dart';
 
-class Note {
-  final String id;
-  final String title;
-  final String content;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String userId;
-
-  Note({
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.userId,
-  });
-
-  factory Note.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return Note(
-      id: doc.id,
-      title: data['title'] ?? '',
-      content: data['content'] ?? '',
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
-      userId: data['userId'] ?? '',
-    );
-  }
-
-  Map<String, dynamic> toFirestore() {
-    return {
-      'title': title,
-      'content': content,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'userId': userId,
-    };
-  }
-}
-
-class FirestoreService {
+class NotesRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Get user's notes stream
-  Stream<List<Note>> getUserNotes(String userId) {
+  Stream<List<Note>> watchNotes(String userId) {
     return _firestore
         .collection('users')
         .doc(userId)
@@ -54,67 +14,55 @@ class FirestoreService {
         .map((snapshot) => snapshot.docs.map((doc) => Note.fromFirestore(doc)).toList());
   }
 
-  // Add a new note
-  Future<void> addNote(Note note) async {
-    try {
-      await _firestore
-          .collection('users')
-          .doc(note.userId)
-          .collection('notes')
-          .add(note.toFirestore());
-    } catch (e) {
-      print('Error adding note: $e');
-      throw e;
-    }
+  Future<List<Note>> fetchNotes(String userId) async {
+    final querySnapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('notes')
+        .orderBy('updatedAt', descending: true)
+        .get();
+    return querySnapshot.docs.map((doc) => Note.fromFirestore(doc)).toList();
   }
 
-  // Update a note
-  Future<void> updateNote(Note note) async {
-    try {
-      await _firestore
-          .collection('users')
-          .doc(note.userId)
-          .collection('notes')
-          .doc(note.id)
-          .update(note.toFirestore());
-    } catch (e) {
-      print('Error updating note: $e');
-      throw e;
-    }
+  Future<Note> addNote(String text, String userId) async {
+    final now = DateTime.now();
+    final note = Note(
+      id: '',
+      title: '', // You may want to update this to accept title
+      content: text, // For now, treat text as content
+      createdAt: now,
+      updatedAt: now,
+      userId: userId,
+    );
+    final docRef = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('notes')
+        .add(note.toFirestore());
+    return note.copyWith(id: docRef.id);
   }
 
-  // Delete a note
-  Future<void> deleteNote(String userId, String noteId) async {
-    try {
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('notes')
-          .doc(noteId)
-          .delete();
-    } catch (e) {
-      print('Error deleting note: $e');
-      throw e;
-    }
+  Future<Note> updateNote(String id, String text, String userId) async {
+    final updatedAt = DateTime.now();
+    final docRef = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('notes')
+        .doc(id);
+    await docRef.update({
+      'content': text,
+      'updatedAt': Timestamp.fromDate(updatedAt),
+    });
+    final doc = await docRef.get();
+    return Note.fromFirestore(doc);
   }
 
-  // Get a single note
-  Future<Note?> getNote(String userId, String noteId) async {
-    try {
-      DocumentSnapshot doc = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('notes')
-          .doc(noteId)
-          .get();
-
-      if (doc.exists) {
-        return Note.fromFirestore(doc);
-      }
-      return null;
-    } catch (e) {
-      print('Error getting note: $e');
-      throw e;
-    }
+  Future<void> deleteNote(String id, String userId) async {
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('notes')
+        .doc(id)
+        .delete();
   }
 }

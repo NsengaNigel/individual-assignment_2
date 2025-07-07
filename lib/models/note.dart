@@ -2,14 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Note {
   final String id;
-  final String text;
+  final String title;
+  final String content;
   final DateTime createdAt;
   final DateTime updatedAt;
   final String userId;
 
   Note({
     required this.id,
-    required this.text,
+    required this.title,
+    required this.content,
     required this.createdAt,
     required this.updatedAt,
     required this.userId,
@@ -19,7 +21,8 @@ class Note {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return Note(
       id: doc.id,
-      text: data['text'] ?? '',
+      title: data['title'] ?? '',
+      content: data['content'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       userId: data['userId'] ?? '',
@@ -28,7 +31,8 @@ class Note {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'text': text,
+      'title': title,
+      'content': content,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
       'userId': userId,
@@ -37,14 +41,16 @@ class Note {
 
   Note copyWith({
     String? id,
-    String? text,
+    String? title,
+    String? content,
     DateTime? createdAt,
     DateTime? updatedAt,
     String? userId,
   }) {
     return Note(
       id: id ?? this.id,
-      text: text ?? this.text,
+      title: title ?? this.title,
+      content: content ?? this.content,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       userId: userId ?? this.userId,
