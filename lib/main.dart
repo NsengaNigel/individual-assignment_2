@@ -8,20 +8,10 @@ import 'screens/auth/auth_screen.dart';
 import 'screens/notes/notes_screen.dart';
 
 void main() async {
-  // Ensure Flutter is initialized
   WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    // Initialize Firebase
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    print('🔥 Firebase initialized successfully');
-  } catch (e) {
-    print('❌ Firebase initialization failed: $e');
-    // You might want to show an error screen here
-  }
-
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
