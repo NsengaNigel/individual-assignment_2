@@ -47,12 +47,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'your-web-api-key',
-    appId: 'your-web-app-id',
-    messagingSenderId: 'your-messaging-sender-id',
-    projectId: 'your-project-id',
-    authDomain: 'your-project-id.firebaseapp.com',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyC63kLYvF_5x9oo96ZUmBE-u6ibUThFP4M',
+    appId: '1:321077969662:web:66f9d57c3a2b16834e5baf',
+    messagingSenderId: '321077969662',
+    projectId: 'notes-app-68680',
+    authDomain: 'notes-app-68680.firebaseapp.com',
+    storageBucket: 'notes-app-68680.firebasestorage.app',
+    measurementId: 'G-ZY7BPL47KM',
   );
 
   static const FirebaseOptions android = FirebaseOptions(

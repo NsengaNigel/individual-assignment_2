@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'blocs/auth/auth_bloc.dart';
+import 'repositories/auth_repository.dart';
+import 'screens/auth/auth_screen.dart';
+import 'screens/notes/notes_screen.dart';
 
 void main() async {
   // Ensure Flutter is initialized
@@ -23,13 +28,27 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Notes App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return RepositoryProvider(
+      create: (_) => AuthRepository(),
+      child: BlocProvider(
+        create: (context) => AuthBloc(authRepository: context.read<AuthRepository>())..add(AuthCheckRequested()),
+        child: MaterialApp(
+          title: 'Notes App',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          home: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              if (state is AuthAuthenticated) {
+                return NotesScreen();
+              } else {
+                return AuthScreen();
+              }
+            },
+          ),
+        ),
       ),
-      home: AuthWrapper(), // We'll create this to handle authentication
     );
   }
 }
