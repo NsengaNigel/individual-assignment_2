@@ -12,6 +12,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  print('Firebase initialized'); // DEBUG PRINT
   runApp(MyApp());
 }
 
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
           ),
           home: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
+              print('AuthBloc state: ' + state.runtimeType.toString()); // DEBUG PRINT
               if (state is AuthAuthenticated) {
                 return NotesScreen();
               } else {
