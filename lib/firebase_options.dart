@@ -57,11 +57,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'your-android-api-key',
-    appId: 'your-android-app-id',
-    messagingSenderId: 'your-messaging-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyDa_4mpdNBP_SPD7Fh8LAypYlF2wzJUj_4',
+    appId: '1:321077969662:android:4114749b97060eee4e5baf',
+    messagingSenderId: '321077969662',
+    projectId: 'notes-app-68680',
+    storageBucket: 'notes-app-68680.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
